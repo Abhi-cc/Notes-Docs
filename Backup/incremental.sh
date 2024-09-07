@@ -1,3 +1,9 @@
+# This Script Will Do incremental backup using tar and send them to remote using Rsync.
+# Concept 
+## It will take Source and create a full  backup at start of the current month and then it will create incremental backup 
+## for rest of the month and Now When the Month Changes a new directory will be created with the new month and a full backup will be created in the new directory and So on
+## And at last it will find the directory with last month and delete it.  
+
 #!/bin/bash
 
 Date=$(date +%F-%a-%H)
