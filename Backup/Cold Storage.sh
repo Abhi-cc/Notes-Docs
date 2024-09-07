@@ -27,7 +27,7 @@ rsync -Avazh  --progress  $Source_Dir "$Destination_Dir/$Date" 1>> /dev/null 2>>
 # It will create a Month directory and copy there
 if [ $? -eq 0 ]
 then
-   tar -cvzf <SRC>/$Date.tar.gz <DEST>/$Date
+   tar -cvzf "$Destination_Dir/$Date.tar.gz" "$Destination_Dir/$Date"
 else
    echo -e " ${Red} Try again, There is Problem ${NC} Check $error_log_file" 
    exit 1
