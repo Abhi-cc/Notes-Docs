@@ -8,8 +8,8 @@
 ## Quick WalkThrough for Setting up Encrypted S3 bucket remote
 
 [!NOTE]
+> This is for Testing Purpose Only. Ill am still working on full tutorial with screen shots and explanation
 
-> This is for Testing Purpose Only. Ill am still working on full tutorial with screen shots and explanatio
 > `rclone Config`
 > _Follow the Interactice Setup Process_ > **For S3**: Find the number and then type the number.
 > **Keys**: Generate Access key pairs for the rclone to use.
