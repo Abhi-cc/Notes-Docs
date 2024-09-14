@@ -27,8 +27,8 @@ if [ ! -d "$Destination/$Month" ]; then
 fi
 # Create archieve of the Source and Send it to Destination to a remote host
 
-if tar -cvzP "$Destination/$Month/$Date.tar.gz" --listed-incremental="$Destination/$Month/list.snar"    $Source 1>>/dev/null 2>>$error_log_file; then
-   rsync -avz $Destination/*.tar.gz $Destination/*.snar <Your Remote Server Ip address> :~/hotbackup/ 1>> /dev/null 2>>$error_log_file 
+if tar -cvzf "$Destination/$Month/$Date.tar.gz" --listed-incremental="$Destination/$Month/list.snar"    "$Source" 1>>/dev/null 2>>$error_log_file; then
+   rsync -avz "$Destination/" <Your Remote Server Ip address> :~/hotbackup/ 1>> /dev/null 2>>$error_log_file 
 else
    echo  -e " $Date - Backup Error check $error_log_file" 
 fi 
