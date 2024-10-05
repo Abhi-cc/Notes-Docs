@@ -34,4 +34,4 @@ Now lets update the files see the sync process
 
 
 > [!NOTE]
-> Working on Rest of the Features of Tools
+> Working on Rest of the Features of the Tool
