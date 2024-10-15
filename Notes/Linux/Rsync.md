@@ -119,7 +119,7 @@ First i did a intial sync:
 <img width="686" alt="rsync-12" src="https://github.com/user-attachments/assets/bbd078c8-946a-46ca-8412-ddeaa96ac062">
 
 
-Then i Deleted the file3.txt and used the `--delete` tag to make sure everything in complete sync and used `-backup` switch to make sure a copy of the deleted file is created. 
+Then i Deleted the file3.txt and used the `--delete` tag to make sure everything in complete sync and used `--backup` switch to make sure a copy of the deleted file is created. 
 
 <img width="849" alt="rsync-13" src="https://github.com/user-attachments/assets/7e47d3b3-8fec-4b4e-9c1f-5c09b068f824">
 
@@ -173,7 +173,7 @@ and filze size before syncing. By using the `--checksum` switch it will generate
 ```bash
 rsync -avzh --checksum . test@kali:~/rsynctest/
 ```
-``
+
 
 
 `--files-from`  A file with list of directories and files can be specified using `--files-from` switch. If theare are good numbers of files and directories to be specified as source. They can be put in a file rather then puting the names on the command itself.
