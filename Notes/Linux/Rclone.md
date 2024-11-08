@@ -342,3 +342,45 @@ Inthis mode rclone will read and write directly from the remote. But a file cann
 >[!IMPORTANT]
 >This should work on mac and linux. 
 >For Windows mount see offical Docs
+
+### Other Useful Options
+
+`rclone ncdu`  : NCDU is a text based user interface, used to check disk spaces especially which file or directory is using the most disk space.
+
+```bash
+rclone ncdu test_sftp:rclonetest
+```
+
+![rclone-24](https://github.com/user-attachments/assets/19b06da1-e5ea-43e2-a688-ab1921bd6c04)
+
+
+
+`rclone tree` will list the remotes in a tree like format 
+
+```bash
+rclone tree test_sftp:
+```
+
+
+![rclone-25](https://github.com/user-attachments/assets/ca2c8402-35cb-4a1e-869b-abf80c3235f4)
+
+
+`rclone serve nfs`   It starts a nfs server and serve the remote over nfs. Very useful with MacOS if have trouble installing FUSE
+```bash
+rclone serve nfs test_sftp: --vfs-cache-mode=full
+```
+
+![rclone-27](https://github.com/user-attachments/assets/6b47de63-89dd-405e-9054-5429f944241a)
+
+
+
+
+`rclone serve http` it will serve the remote over http(port 8080) and can be accesed using brower.
+
+```bash
+rclone serve http test_sftp:
+```
+
+![rclone-26](https://github.com/user-attachments/assets/c2ef4e27-5796-4e63-ad57-f33d44c6b10b)
+
+
