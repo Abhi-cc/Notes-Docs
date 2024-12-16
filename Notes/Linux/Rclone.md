@@ -649,7 +649,12 @@ rclone ls --s3-versions s3-test:rclone-demo
 ---
 
 
+# Backbaze B2 as remote
 
+Pending
+ 
+# Encryption
+pending
 
 
 
