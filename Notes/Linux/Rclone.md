@@ -384,3 +384,285 @@ rclone serve http test_sftp:
 ![rclone-26](https://github.com/user-attachments/assets/c2ef4e27-5796-4e63-ad57-f33d44c6b10b)
 
 
+------
+
+
+## Rclone with AWS S3 Bucket as Remote
+
+### AWS S3 Bucket Setup 
+
+#### Creating Bucket 
+  -  login into your aws account and go to S3 console and create bucket
+  -  Fill the info such as bucket name , bucket versioning.
+    ![rclone-27](https://github.com/user-attachments/assets/92578d30-8fa9-4cb8-9c3b-8a0fc11359a9)
+  
+  - Leave Default on *Block Public access* and other options or change it to your use case
+  - ![rclone-29](https://github.com/user-attachments/assets/cb3935c5-15a5-43b8-8042-06315cf323a8)
+  
+  - ![rclone-30](https://github.com/user-attachments/assets/8bc4f1d2-62bf-4b6e-a03b-3e3645e4516e)
+
+  - Go Ahead create the bucket and you will see the bucket appear in your S3 console
+
+> [!WARNING]
+> Make sure recheck the public access is blocked. Before uploading anything.
+>
+
+### Creating a IAM user and giving it only required permissions.
+
+#### Creating IAM user
+
+ - Go to IAM console and then users 
+ - Click on create users
+ - ![rclone-31](https://github.com/user-attachments/assets/e7b0f252-a2f1-4f86-95d7-5d35c5a7b8e8)
+ - Permissions are required next, Check `attach policy directly`  or create group with required permissions and add user to the group. Then `Create Policy`
+ 
+ - ![rclone-32](https://github.com/user-attachments/assets/7b745f70-a916-44db-b64c-6423240b430c)
+ 
+ - ![rclone-33](https://github.com/user-attachments/assets/10a293d6-5fa9-4f9a-9a6d-a11488258915)
+
+ - ![rclone-34](https://github.com/user-attachments/assets/1d656fba-8276-45f8-9d0e-d7c712d76558)
+
+#### Generating keys for IAM Users.
+
+- Go the Users Tab and select the user created 
+- Go to the security Credential Tab
+- ![rclone-35](https://github.com/user-attachments/assets/30207491-4d4f-48e9-bf4f-dd29374fc1e3)
+- Scroll Down to Access Keys and click create access keys
+- ![rclone-36](https://github.com/user-attachments/assets/237985aa-86d1-43cc-98cb-f8645466ebe0)
+- ![rclone-37](https://github.com/user-attachments/assets/1f729a62-48e9-4a05-ae13-943ee1ab0597)
+
+> [!IMPORTANT]
+> Store your access keys somewhere save
+
+> [!WARNING]
+> Never Generate access keys for your root account.
+
+
+### S3 bucket as remote
+
+#### Rclone Configuration
+
+```bash
+rclone config
+```
+
+(n) New remote and enter the name. Lets say s3_test and Find the S3 mumber should be (4) and after that select (1) for AWS.
+
+Follow the Interactive 
+
+```bash
+provider> 1                                                                                                                                                
+
+Option env_auth.
+Get AWS credentials from runtime (environment variables or EC2/ECS meta data if no env vars).
+Only applies if access_key_id and secret_access_key is blank.
+Choose a number from below, or type in your own boolean value (true or false).
+Press Enter for the default (false).
+ 1 / Enter AWS credentials in the next step.
+   \ (false)                                                                                                                                               
+ 2 / Get AWS credentials from the environment (env vars or IAM).                                                                                           
+   \ (true)                                                                                                                                                
+env_auth>                                                                                                                                                  
+
+Option access_key_id.
+AWS Access Key ID.
+Leave blank for anonymous access or runtime credentials.
+Enter a value. Press Enter to leave empty.
+access_key_id> <ACCESS Key Here>
+
+Option secret_access_key.
+AWS Secret Access Key (password).
+Leave blank for anonymous access or runtime credentials.
+Enter a value. Press Enter to leave empty.
+secret_access_key> <Secret Access Key here>
+
+Option region.
+Region to connect to.
+Choose a number from below, or type in your own value.
+Press Enter to leave empty.
+   / The default endpoint - a good choice if you are unsure.  
+
+Option endpoint.
+Endpoint for S3 API.
+Leave blank if using AWS to use the default endpoint for the region.
+Enter a value. Press Enter to leave empty.
+endpoint> 
+
+Option location_constraint.
+Location constraint - must be set to match the Region.
+Used when creating buckets only.
+Choose a number from below, or type in your own value.
+Press Enter to leave empty.
+ 1 / Empty for US Region, Northern Virginia, or Pacific Northwest
+   \ ()                                                                          
+location_constraint>                                                                                                                                      
+
+Option acl.
+Canned ACL used when creating buckets and storing or copying objects.
+This ACL is used for creating objects and if bucket_acl isn't set, for creating buckets too.
+For more info visit https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
+Note that this ACL is applied when server-side copying objects as S3
+doesn't copy the ACL from the source but rather writes a fresh one.
+If the acl is an empty string then no X-Amz-Acl: header is added and
+the default (private) will be used.
+Choose a number from below, or type in your own value.
+Press Enter to leave empty.
+   / Owner gets FULL_CONTROL.
+ 1 | No one else has access rights (default).                                                                                                              
+   \ (private)                                                                                                                                             
+   / Owner gets FULL_CONTROL.                                                                                                                              
+ 2 | The AllUsers group gets READ access.                                                                                                                  
+   \ (public-read)                                                                                                                                         
+   / Owner gets FULL_CONTROL.                                                                                                                              
+ 3 | The AllUsers group gets READ and WRITE access.                                                                                                        
+   | Granting this on a bucket is generally not recommended.                                                                                               
+   \ (public-read-write)                                                                                                                                   
+   / Owner gets FULL_CONTROL.                                                                                                                              
+ 4 | The AuthenticatedUsers group gets READ access.                                                                                                        
+   \ (authenticated-read)                                                                                                                                  
+   / Object owner gets FULL_CONTROL.                                                                                                                       
+ 5 | Bucket owner gets READ access.                                                                                                                        
+   | If you specify this canned ACL when creating a bucket, Amazon S3 ignores it.                                                                          
+   \ (bucket-owner-read)                                                                                                                                   
+   / Both the object owner and the bucket owner get FULL_CONTROL over the object.                                                                          
+ 6 | If you specify this canned ACL when creating a bucket, Amazon S3 ignores it.                                                                          
+   \ (bucket-owner-full-control)                                                                                                                           
+acl>                                                                                                                                                       
+
+Option server_side_encryption.
+The server-side encryption algorithm used when storing this object in S3.
+Choose a number from below, or type in your own value.
+Press Enter to leave empty.
+ 1 / None
+   \ ()                                                                                                                                                    
+ 2 / AES256                                                                                                                                                
+   \ (AES256)                                                                                                                                              
+ 3 / aws:kms                                                                                                                                               
+   \ (aws:kms)                                                                                                                                             
+server_side_encryption> 1                                                                                                                                  
+
+Option sse_kms_key_id.
+If using KMS ID you must provide the ARN of Key.
+Choose a number from below, or type in your own value.
+Press Enter to leave empty.
+ 1 / None
+   \ ()                                                                                                                                                    
+ 2 / arn:aws:kms:*                                                                                                                                         
+   \ (arn:aws:kms:us-east-1:*)                                                                                                                             
+sse_kms_key_id>                                                                                                                                            
+
+Option storage_class.
+The storage class to use when storing new objects in S3.
+Choose a number from below, or type in your own value.
+Press Enter to leave empty.
+ 1 / Default
+   \ ()                                                                                                                                                    
+ 2 / Standard storage class                                                                                                                                
+   \ (STANDARD)                                                                                                                                            
+ 3 / Reduced redundancy storage class                                                                                                                      
+   \ (REDUCED_REDUNDANCY)                                                                                                                                  
+ 4 / Standard Infrequent Access storage class                                                                                                              
+   \ (STANDARD_IA)                                                                                                                                         
+ 5 / One Zone Infrequent Access storage class                                                                                                              
+   \ (ONEZONE_IA)                                                                                                                                          
+ 6 / Glacier storage class                                                                                                                                 
+   \ (GLACIER)                                                                                                                                             
+ 7 / Glacier Deep Archive storage class                                                                                                                    
+   \ (DEEP_ARCHIVE)                                                                                                                                        
+ 8 / Intelligent-Tiering storage class                                                                                                                     
+   \ (INTELLIGENT_TIERING)                                                                                                                                 
+ 9 / Glacier Instant Retrieval storage class                                                                                                               
+   \ (GLACIER_IR)                                                                                                                                          
+storage_class>  < Choose yr storage class or set directly in bucket>                                                                                                                                           
+
+Edit advanced config?
+y) Yes
+n) No (default)
+y/n> n
+```
+
+**Lets test the new S3 Remote**
+
+  ![rclone-38](https://github.com/user-attachments/assets/bf846020-99e3-43f9-be51-22433a7bb1da)
+
+  ![rclone-39](https://github.com/user-attachments/assets/a1a92f7d-10ce-41ce-8651-837fdd604488)
+
+  Lets Read the file3.txt
+```bash
+rclone cat s3-test:rclone-demo/file3.txt
+```
+![rclone-40](https://github.com/user-attachments/assets/93045f93-ad58-4815-b2ae-41be87bba5ea)
+
+Remove the Image file from the bucket
+```bash
+rclone rm s3-test:rclone-demo/Img1.png
+```
+
+
+> [!NOTE]
+> All the above opeartions can be used against S3 remote. Such as sync, cat, mv, mount etc
+
+
+
+#### Saving Cost 
+
+> [!IMPORTANT]
+> AWS will charge according the Data stored in the cloud and number of transcation made to the S3 API.
+> API calls the S3 can be reduced by using some tags such as `--checksum` `--fast-list` but this tags will use lot of disk and memory as `--checksum` will create and match the hashes of file and `--fast-list` will load the list in the memory first and thus saving us some transcations.
+> There some more tags , which helps save transcations but they have some trade off too. Refer to the **Rclone docs** for it and use them as per needs  
+
+```bash
+rclone check --fast-list --checksum . s3-test:rclone-demo
+
+```
+![rclone-41](https://github.com/user-attachments/assets/a5b02703-db02-49a8-98b3-725faae284e9)
+
+**S3 Life Cycle and bucket versioning**
+
+Life Cycle Policy for the objects can be setup in the S3 console for moving the object from 1 storage class to other storage class which will help save cost on the data stored but when data need to reterieved, some more cost willl be charged. 
+
+**Storage Tiers for S3**
+
+Standard ---> Standard IA ---- Inteliggent tier ---> IA - One Zone ---> Glacier instant --->. Glacier flexible -----> Glacier Deep archieve
+
+>[!NOTE]
+>Glacier tier is more cheap for long term storage such as backups. But be sure to check the **reterival cost and time**
+
+**Bucket Versioning**
+
+List the bucket Versioning
+
+`rclone backend versioning s3-test:rclonedemo`
+
+Bucket versioning can be enable from the s3 console.
+
+![rclone-42](https://github.com/user-attachments/assets/b61a0bf2-7de2-46d7-befd-56eee956d4c5)
+
+Listing the different versions of file 
+
+```bash
+rclone ls --s3-versions s3-test:rclone-demo
+```
+
+![rclone-43](https://github.com/user-attachments/assets/70a1b4f9-ec0b-447c-9aa1-d966be5192be)
+
+---
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+ 
+  
