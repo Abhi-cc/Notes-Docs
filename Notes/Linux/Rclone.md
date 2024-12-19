@@ -651,21 +651,242 @@ rclone ls --s3-versions s3-test:rclone-demo
 
 # Backbaze B2 as remote
 
-Pending
+Creating B2 Bucket & Generating Applicaiton keys
+
+  Go to Console and buckets and Create bucket and fill the bucketname
+
+  ![rclone-44](https://github.com/user-attachments/assets/371a600b-1dba-4e57-82d6-b22b17a9c8ca)
+
+  **Lets Generate Application key for the rclone**
+
+1. Go to application keys from the side bar and click add new Application key
+2. Fill in the details and select the new bucket created from drop down menu and fill other settings as per usecase
+3. ![rclone-45](https://github.com/user-attachments/assets/0702ec8d-370f-411b-99f9-ea17fe51b99a)
+
+
+> [!IMPORTANT]
+> If possible use your application key and try not to use your master key
+
+
+### B2 as Remote 
+
+1. Enter the interactive session for rclone
+   ```bash
+   rclone config
+```
+ 2. Enter the details as asked 
+```bash
+Choose a number from below, or type in your own value.
+
+ 5 / Backblaze B2                                                                                                                                          
+   \ (b2)                                                                        
+
+Storage> 5                                                                                                                                                 
+
+Option account.
+Account ID or Application Key ID.
+Enter a value.
+account> < Your Application Key ID here>
+
+Option key.
+Application Key.
+Enter a value.
+key> <Your Application key here>
+
+Option hard_delete.
+Permanently delete files on remote removal, otherwise hide files.
+Enter a boolean value (true or false). Press Enter for the default (false).
+hard_delete> 
+
+Edit advanced config?
+y) Yes
+n) No (default)
+y/n> n
  
+```
+
+3. Lets test our new b2 remote
+ ```bash
+ rclone copy file3.txt b2:rclone-test123
+
+ rclone copy img1.jpg --verbose --progress b2:rclone-test123
+```
+![rclone-46](https://github.com/user-attachments/assets/3e45ca47-ada3-4867-9d86-a324ea586cb6)
+
+![rclone-47](https://github.com/user-attachments/assets/87252c93-e412-4f74-8efb-9f47e57ff891)
+
+
+------
+
+
 # Encryption
-pending
+
+## Encryption 
+
+Till now  all the data uploaded was plain format or using the cloud provided encryption. Rclone can do client side encryption and so the data before being uploaded to any of the remote will be encrypted. 
+
+Rclone uses crypt on the top of existing remote as a way of setting up client side encryption
 
 
 
 
+Create a new remote and select crypt for setting up encryption 
+
+ Follow the interative session
+  ```bash
+  Enter name for new remote.
+name> s3-crypt
+
+Option Storage.
+Type of storage to configure.
+Choose a number from below, or type in your own value.    
+
+13 / Encrypt/Decrypt a remote                                                                                                                               
+   \ (crypt)                                                                                                                                                
+Storage> 13                                                                                                                                                 
+
+Option remote.
+Remote to encrypt/decrypt.
+Normally should contain a ':' and a path, e.g. "myremote:path/to/dir",
+"myremote:bucket" or maybe "myremote:" (not recommended).
+Enter a value.
+remote> s3-test:rclone-demo 
+
+Option filename_encryption.
+How to encrypt the filenames.
+Choose a number from below, or type in your own value of type string.
+Press Enter for the default (standard).
+   / Encrypt the filenames.
+ 1 | See the docs for the details.    #This will mask the File details                                                                                                                      
+   \ (standard)                                                                                                                                             
+ 2 / Very simple filename obfuscation.                                                                                                                      
+   \ (obfuscate)                                                                                                                                            
+   / Don't encrypt the file names.                                                                                                                          
+ 3 | Adds a ".bin", or "suffix" extension only.                                                                                                             
+   \ (off)                                                                                                                                                  
+filename_encryption> 1                                                                                                                                      
+
+Option directory_name_encryption.
+Option to either encrypt directory names or leave them intact.
+NB If filename_encryption is "off" then this option will do nothing.
+Choose a number from below, or type in your own boolean value (true or false).
+Press Enter for the default (true).
+ 1 / Encrypt directory names.  
+   \ (true)                                                                                                                                                 
+ 2 / Don't encrypt directory names, leave them intact.                                                                                                      
+   \ (false)                                                                                                                                                
+directory_name_encryption> 1                                                                                                                                
+
+Option password.
+Password or pass phrase for encryption.
+Choose an alternative below.
+y) Yes, type in my own password
+g) Generate random password
+y/g> g
+Password strength in bits.
+64 is just about memorable
+128 is secure
+1024 is the maximum
+Bits> 128
+Your password is: <Password Here>
+Use this password? Please note that an obscured version of this 
+password (and not the password itself) will be stored under your 
+configuration file, so keep this generated password in a safe place.
+y) Yes (default)
+n) No
+y/n> 
+
+Option password2.
+Password or pass phrase for salt.
+Optional but recommended.
+Should be different to the previous password.
+Choose an alternative below. Press Enter for the default (n).
+y) Yes, type in my own password
+g) Generate random password
+n) No, leave this optional password blank (default)
+y/g/n> g
+Password strength in bits.
+64 is just about memorable
+128 is secure
+1024 is the maximum
+Bits> 128
+Your password is: <Second Password here>
+Use this password? Please note that an obscured version of this 
+password (and not the password itself) will be stored under your 
+configuration file, so keep this generated password in a safe place.
+y) Yes (default)
+n) No
+y/n> g
+This value must be one of the following characters: y, n.
+y/n> y
+
+
+```
+
+
+A new will be shown in the list and all the files will be uploaded using this new remote rather then the old s3 remote.for it to be encrypted
+
+
+![rclone-48](https://github.com/user-attachments/assets/7f9a4cd7-5e03-4db2-bbb8-77d9d1b17b59)
+
+
+`rclone copy --verbose --progress . s3-crypt:`
+
+![rclone-49](https://github.com/user-attachments/assets/ea987bfb-b3b5-48c9-a25d-382e958d2b1d)
+
+![rclone-50](https://github.com/user-attachments/assets/dcfa5d94-50ec-4d03-a399-bbb635a7c578)
+
+
+
+
+>[!TIP]
+>Rclone check wont work for the remote with encryption so use cryptcheck for the remote with crypt
+
+>[!NOTE]
+>Similar steps can be performed to encrypted other types of remote such as b2
 
   
 
+### Protecting access to rclone itself and its config file
 
 
 
+Rclone main configuration file which store all the keys and passowrds in obsructed format  can be encrypted using a password .
 
+```bash
+rclone config encryption set
+```
+
+or 
+
+```bash
+rclone config 
+
+----
+s) Set configuration password
+q) Quit config
+```
+
+>[!Important]
+>Make sure to backup the rclone config file, if somehow the keys for the remote are lost, remote can be still be connected using the config file with the password used for encrypting the config file
+
+
+# Rclone GUI 
+
+Rclone as a optinal GUI  which  act a fronted can be enabled using 
+
+```bash
+rclone rcd --rc-web-gui
+
+```
+
+![rclone-51](https://github.com/user-attachments/assets/b7252a2b-9d12-4371-b755-92ec6093b9b5)
+
+![rclone-52](https://github.com/user-attachments/assets/b7b2843b-10ce-4c0f-932c-adf0aecfea72)
+
+
+>[!NOTE]
+>For full configuration options of rclone GUI check Official Doc
 
 
 
